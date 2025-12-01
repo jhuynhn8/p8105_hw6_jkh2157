@@ -133,5 +133,24 @@ city_results_table =
 city_results_table |> 
   knitr::kable(digits = 3)
 
+model.matrix(~ victim_sex, data = homicide_df) |> head()
 ```
+
+**Interpretation**: Across U.S. cities, the adjusted odds of solving a homicide are consistently lower for male victims than for female victims, even after controlling for age and race.
+
+#### Plot estimated ORs and CI 
+
+```{r}
+city_results |> 
+  ggplot(aes(x = fct_reorder(city_state, OR), y = OR)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper)) +
+  coord_flip() +
+  labs(
+    x = "City",
+    y = "Adjusted Odds Ratio",
+    title = "Adjusted ORs for Homicide Resolution Across U.S. Cities"
+  )
+```
+
 

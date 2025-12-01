@@ -264,7 +264,24 @@ boot_ci |>
 ```
 
 **Interpretation**: 
+
 - 2.5th percentile and 97.5th percentile of the bootstrap distribution serve as the lower and upper bounds of the 95% CI.
 - The 95% CI for R^2 (0.934–0.947) is very narrow, showing that the model’s explanatory power is strong and highly stable.
 - The much wider CI for the coefficient ratio (–275 to –125) reflects high variability, driven by the very small precipitation coefficient.
+
+# Problem 3 
+
+#### Load data 
+
+```{r}
+birthweight_df =
+  read_csv("data/birthweight.csv") |>
+  mutate(
+    babysex = factor(babysex),
+    malform = factor(malform),
+    mrace   = factor(mrace),
+    frace   = factor(frace)
+  )
+```
+
 

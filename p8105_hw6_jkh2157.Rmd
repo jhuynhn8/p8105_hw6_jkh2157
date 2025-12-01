@@ -284,4 +284,33 @@ birthweight_df =
   )
 ```
 
+#### Main model 
+
+```{r}
+model_main =
+  lm(bwt ~ gaweeks + babysex + momage + ppwt + wtgain + smoken,
+     data = birthweight_df)
+
+tidy(model_main) |>
+  knitr::kable(digits = 3, caption = "Main Model: Coefficient Table")
+```
+
+#### Residual Plot 
+
+```{r}
+birthweight_df |>
+  add_predictions(model_main) |>
+  add_residuals(model_main) |>
+  ggplot(aes(x = pred, y = resid)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(se = FALSE, color = "blue") +
+  labs(
+    title = "Residuals vs Fitted Values (Main Model)",
+    x = "Predicted Birthweight",
+    y = "Residuals"
+  )
+```
+
+**Explanation**: I created a linear model for bwt that included gestational age, infant sex, maternal age, maternal pre pregnancy weight, weight gain, and smoking, since these variables are known to be well-established predictors of fetal growth. I then used `add_predictions()` and `add_residuals()` to look at the adequacy of the model. The plot was dense but mostly centered with only mild curvature at the ends, which means that it should be a reasonable model for these predictors. 
+
 

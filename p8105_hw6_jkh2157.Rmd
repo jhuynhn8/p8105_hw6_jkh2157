@@ -43,3 +43,27 @@ homicide_df |>
   ))
 ```
 
+#### Logistic Regression for Baltimore 
+
+```{r}
+baltimore_df =
+  homicide_df |> 
+  filter(city_state == "Baltimore, MD")
+
+fit_baltimore =
+  baltimore_df |>
+  glm(resolved ~ victim_age + victim_race + victim_sex,
+      data = _,
+      family = binomial())
+
+baltimore_or =
+  fit_baltimore |>
+  tidy() |>
+  mutate(OR = exp(estimate)) |>
+  select(term, log_OR = estimate, OR, p.value)
+
+baltimore_or |> 
+  filter(term == "victim_sexMale")
+```
+
+**Interpretation**: Holding age and race constant, male victims have significantly lower odds of having their homicide solved compared to female victims. The adjusted odds ratio is 0.43, indicating that the odds of case resolution for male victims are about 57% lower than for female victims. The association is also statistically significant (p<0.0001) 

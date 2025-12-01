@@ -11,6 +11,7 @@ library(broom)
 library(modelr)
 library(purrr)
 library(readr)
+library(p8105.datasets)
 ```
 
 # Problem 1 
@@ -151,6 +152,18 @@ city_results |>
     y = "Adjusted Odds Ratio",
     title = "Adjusted ORs for Homicide Resolution Across U.S. Cities"
   )
+```
+
+# Problem 2 
+
+#### Looking at data set 
+
+```{r}
+data("weather_df")
+
+weather_df =
+  weather_df |> 
+  drop_na(tmax, tmin, prcp)
 ```
 
 

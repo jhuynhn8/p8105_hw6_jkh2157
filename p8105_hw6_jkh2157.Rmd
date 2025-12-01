@@ -246,3 +246,25 @@ boot_results |>
 **Interpretation for the bootstrap distribution of R Squared**: The bootstrap distribution of R squared is very narrow (0.93-0.95) and tightly centered around ~0.94, indicating that the linear model consistently explains about 94% of the variation in maximum temperature across resampled datasets. The small spread of the distribution shows that the model’s explanatory power is highly stable since the repeated sampling produces nearly identical values. This suggests that the relationship between tmax and its predictors is strong and not that sensitive to sampling variability.
 
 **Interpretation for the bootstrap distribution of Betas**: The distribution of the coefficient ratio is much wider and skewed compared to R squared. This shows that there is greater sampling variability in the ratio. Looking at the estimates, the prcp coefficient is near 0 which likely explains why small estimation differences across resamples is magnified. Therefore, the coefficients are much more sensitive and not as stable. 
+
+#### Confidence intervals 
+
+```{r}
+boot_ci =
+  boot_results |> 
+  summarize(
+    r2_lower  = quantile(r2, 0.025),
+    r2_upper  = quantile(r2, 0.975),
+    br_lower  = quantile(beta_ratio, 0.025),
+    br_upper  = quantile(beta_ratio, 0.975)
+  )
+
+boot_ci |> 
+  knitr::kable(digits = 3)
+```
+
+**Interpretation**: 
+- 2.5th percentile and 97.5th percentile of the bootstrap distribution serve as the lower and upper bounds of the 95% CI.
+- The 95% CI for R^2 (0.934–0.947) is very narrow, showing that the model’s explanatory power is strong and highly stable.
+- The much wider CI for the coefficient ratio (–275 to –125) reflects high variability, driven by the very small precipitation coefficient.
+

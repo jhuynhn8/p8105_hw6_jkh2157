@@ -199,7 +199,50 @@ boot_results =
   ) |>
   select(r2, beta_ratio)
 
-#was going to ds
+#Creating clean table with all of these estimates 
+orig_table =
+  tibble(
+    quantity = c("R-squared", "beta_tmin", "beta_prcp", "beta_ratio"),
+    estimate = c(
+      glance(fit)$r.squared,
+      tidy(fit) |> filter(term == "tmin") |> pull(estimate),
+      tidy(fit) |> filter(term == "prcp") |> pull(estimate),
+      (tidy(fit) |> filter(term == "tmin") |> pull(estimate)) /
+        (tidy(fit) |> filter(term == "prcp") |> pull(estimate))
+    )
+  )
+
+orig_table |> knitr::kable(digits = 3)
 ```
 
+### Plotting 
 
+#### R squared Distribution 
+
+```{r}
+boot_results |> 
+  ggplot(aes(x = r2)) +
+  geom_density(fill = "skyblue", alpha = 0.5) +
+  labs(
+    title = "Bootstrap Distribution of R²",
+    x = "R²",
+    y = "Density"
+  )
+```
+
+#### Beta Distribution 
+
+```{r}
+boot_results |> 
+  ggplot(aes(x = beta_ratio)) +
+  geom_density(fill = "coral", alpha = 0.5) +
+  labs(
+    title = "Bootstrap Distribution of β 1 / β 2",
+    x = "β₁ / β₂",
+    y = "Density"
+  )
+```
+
+**Interpretation for the bootstrap distribution of R Squared**: The bootstrap distribution of R squared is very narrow (0.93-0.95) and tightly centered around ~0.94, indicating that the linear model consistently explains about 94% of the variation in maximum temperature across resampled datasets. The small spread of the distribution shows that the model’s explanatory power is highly stable since the repeated sampling produces nearly identical values. This suggests that the relationship between tmax and its predictors is strong and not that sensitive to sampling variability.
+
+**Interpretation for the bootstrap distribution of Betas**: The distribution of the coefficient ratio is much wider and skewed compared to R squared. This shows that there is greater sampling variability in the ratio. Looking at the estimates, the prcp coefficient is near 0 which likely explains why small estimation differences across resamples is magnified. Therefore, the coefficients are much more sensitive and not as stable. 

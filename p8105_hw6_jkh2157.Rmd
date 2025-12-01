@@ -64,6 +64,74 @@ baltimore_or =
 
 baltimore_or |> 
   filter(term == "victim_sexMale")
+
+#creating a nicer table 
+
+baltimore_results =
+  fit_baltimore |> 
+  tidy() |>
+  mutate(
+    OR = exp(estimate),
+    ci_lower = exp(estimate - 1.96 * std.error),
+    ci_upper = exp(estimate + 1.96 * std.error)
+  ) |>
+  filter(term == "victim_sexMale") |>
+  select(
+    term,
+    log_OR = estimate,
+    OR,
+    ci_lower,
+    ci_upper,
+    p.value
+  )
+
+baltimore_results |> 
+  knitr::kable(digits = 3)
+
 ```
 
 **Interpretation**: Holding age and race constant, male victims have significantly lower odds of having their homicide solved compared to female victims. The adjusted odds ratio is 0.43, indicating that the odds of case resolution for male victims are about 57% lower than for female victims. The association is also statistically significant (p<0.0001) 
+
+#### Linear Regression for other cities: Using nest and map 
+
+```{r}
+city_results =
+  homicide_df |> 
+  nest(data = -city_state) |>
+  mutate(
+    models = map(data, \(df)
+      glm(resolved ~ victim_age + victim_race + victim_sex,
+          data = df,
+          family = binomial())
+    ),
+    results = map(models, tidy)
+  ) |>
+  select(-data, -models) |>
+  unnest(results) |>
+  mutate(OR = exp(estimate)) |>
+  filter(term == "victim_sexMale") |>
+  group_by(city_state) |>
+  mutate(
+    ci_lower = exp(estimate - 1.96 * std.error),
+    ci_upper = exp(estimate + 1.96 * std.error)
+  ) |>
+  ungroup()
+
+#creating nicer tables 
+city_results_table =
+  city_results |> 
+  select(
+    city_state,
+    log_OR = estimate,
+    OR,
+    ci_lower,
+    ci_upper,
+    p.value
+  ) |>
+  arrange(OR)
+
+city_results_table |> 
+  knitr::kable(digits = 3)
+
+```
+
